@@ -36,7 +36,6 @@ pipeline {
                     echo "Creating Dockerfile..."
                     dir("${DIR_UNZIP}") {  
                         sh '''
-                            cat <<EOF > Dockerfile
                             FROM maven:3.8.7-eclipse-temurin-19 AS build
                             WORKDIR /app
                             COPY . .
@@ -53,23 +52,5 @@ pipeline {
                 }
             }
         }
-
-        stage("Build Docker Image") {
-            steps {
-                script {
-                    echo "Building the Maven project..."
-                    dir("${DIR_UNZIP}") {
-                        sh """
-                            if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                                mvn clean install
-                            fi
-                        """
-
-                    echo "Building Docker image..."
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
-                }
-            }
-        }
     }
-}
 }
