@@ -59,19 +59,10 @@ pipeline {
                 script {
                     echo "Building the Maven project..."
                     dir("${DIR_UNZIP}") {
-                        sh """
-                            if [ -f 'pom.xml' ]; then  
-                                mvn clean install
-                            else
-                                echo "No pom.xml found in ${DIR_UNZIP}. Aborting build."
-                                exit 1
-                            fi
-                        """
-                    }
-
-                    echo "Building Docker image..."
-                    dir("${DIR_UNZIP}") { 
+    
+                        echo "Building Docker image..."
                         sh "docker build -t ${DOCKER_IMAGE} ."
+
                     }
                 }
             }
