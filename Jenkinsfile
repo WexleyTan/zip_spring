@@ -58,12 +58,15 @@ pipeline {
             steps {
                 script {
                     echo "Building the Maven project..."
-                    dir("${DIR_UNZIP}") {
-    
-                        echo "Building Docker image..."
-                        sh "docker build -t ${DOCKER_IMAGE} ."
+                    sh """
+                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
+                            cd ${DIR_UNZIP}  
+                            mvn clean install
+                        fi
+                    """
 
-                    }
+                    echo "Building Docker image..."
+                    sh "docker build -t ${DOCKER_IMAGE} ."  
                 }
             }
         }
