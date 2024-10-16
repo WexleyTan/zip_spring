@@ -9,10 +9,29 @@ pipeline {
         DIR_UNZIP = "demo"
         DOCKER_IMAGE = "${IMAGE}:${BUILD_NUMBER}"
         DOCKER_CONTAINER = "springboot_jenkins"
-        DOCKER_CREDENTIALS_ID = "dockertoken"
     }
 
     stages {
+        stage('Create Dockerfile') {
+            steps {
+                script {
+                    echo "Creating Dockerfile in the root directory..."
+                    sh """
+                        if [ ! -f Dockerfile ]; then
+                            echo 'FROM eclipse-temurin:17-jre-alpine' > Dockerfile
+                            echo 'WORKDIR /app' >> Dockerfile
+                            echo 'COPY target/*.jar app.jar' >> Dockerfile
+                            echo 'EXPOSE 8080' >> Dockerfile
+                            echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+                            echo "Dockerfile created successfully."
+                        else
+                            echo "Dockerfile already exists."
+                        fi
+                    """
+                }
+            }
+        }
+
         stage('Unzip File') {
             steps {
                 script {
@@ -28,55 +47,52 @@ pipeline {
                 }
             }
         }
-        stage('Create Dockerfile') {
+
+        stage("Build Maven Project") {
             steps {
                 script {
-                    echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
-                    WORKDIR /app
-                    COPY . .
-                    RUN mvn clean package
-                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                    COPY --from=build /app/target/*.jar /app/app.jar
-                    EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
-                }
-            }
-        }
-        stage('Check Dockerfile') {
-            steps {
-                script {
-                    echo "Checking if Dockerfile exists..."
+                    echo "Building the Maven project..."
                     sh """
-                        if [ ! -f "${DIR_UNZIP}/Dockerfile" ]; then
-                            echo "Dockerfile not found in ${DIR_UNZIP}"
-                            exit 1
+                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
+                            cd ${DIR_UNZIP}
+                            mvn clean package
                         fi
                     """
                 }
             }
         }
 
-         stage('Copy Dockerfile') {
+        stage("Build Docker Image") {
             steps {
                 script {
-                    echo "Copying Dockerfile into demo directory..."
+                    echo "Building Docker image from Dockerfile..."
                     sh """
-                        if [ -f 'Dockerfile' ]; then
-                            cp Dockerfile ${DIR_UNZIP}/
-                            echo "Dockerfile copied to ${DIR_UNZIP}"
-                        else
-                            echo "Dockerfile not found in the root directory!"
-                            exit 1
-                        fi
+                        cd ${DIR_UNZIP}
+                        docker build -t ${DOCKER_IMAGE} .
                     """
                 }
             }
         }
 
-        
-       
+        stage("Deploy") {
+            steps {
+                script {
+                    echo "Deploying the Docker container..."
+                    sh """
+                        docker stop ${DOCKER_CONTAINER} || true
+                        docker rm ${DOCKER_CONTAINER} || true
+                        docker run --name ${DOCKER_CONTAINER} -d -p 9090:8080 ${DOCKER_IMAGE}
+                    """
+                    sh 'docker ps'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning up Docker images..."
+            sh 'docker image prune -f'
+        }
     }
 }
