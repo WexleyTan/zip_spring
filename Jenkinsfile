@@ -26,6 +26,15 @@ pipeline {
                 }
             }
         }
+          stage('Copy Dockerfile') {
+            steps {
+                script {
+                    echo "Copying Dockerfile to ${DIR_UNZIP}..."
+                    sh "cp ../Dockerfile ${DIR_UNZIP}/"
+                }
+            }
+        }
+
         stage('Create Dockerfile') {
             steps {
                 script {
