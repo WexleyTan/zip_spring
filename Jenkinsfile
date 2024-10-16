@@ -51,13 +51,13 @@ pipeline {
                 script {
                     echo "Building the Maven project..."
                     sh """
-                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                            cd ${DIR_UNZIP}  
+                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then   
                             mvn clean install
                         fi
                     """
 
                     echo "Building Docker image..."
+                    sh "cp ../Dockerfile ."
                     sh "docker build -t ${DOCKER_IMAGE} ."  
                 }
             }
