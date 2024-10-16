@@ -59,24 +59,24 @@ pipeline {
             }
         }
 
-        
-        stage("Build Docker Image") {
+         stage('Copy Dockerfile') {
             steps {
                 script {
-                    echo "Building the Maven project..."
+                    echo "Copying Dockerfile into demo directory..."
                     sh """
-                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then   
-                            mvn clean install
+                        if [ -f 'Dockerfile' ]; then
+                            cp Dockerfile ${DIR_UNZIP}/
+                            echo "Dockerfile copied to ${DIR_UNZIP}"
+                        else
+                            echo "Dockerfile not found in the root directory!"
+                            exit 1
                         fi
                     """
-
-                    echo "Building Docker image..."
-                    sh """
-                       cd ${DIR_UNZIP}/docker
-                       docker build -t ${DOCKER_IMAGE} .
-                       """
                 }
             }
         }
+
+        
+       
     }
 }
