@@ -29,16 +29,6 @@ pipeline {
             }
         }
 
-          stage("Clean Package") {
-            steps {
-                script {
-                    echo "Building the application..."
-                    dir("${DIR_FILE}") {  
-                        sh 'mvn clean install' 
-                    }
-                }
-            }
-        }
         
         stage('Create Dockerfile') {
             steps {
