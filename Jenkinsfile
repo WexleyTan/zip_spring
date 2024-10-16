@@ -54,9 +54,7 @@ pipeline {
                         if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
                             mvn clean install
                         fi
-                    """
-                    echo "Building Docker image..."
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
+                    """ 
                 }
             }
         }
@@ -64,18 +62,6 @@ pipeline {
     
 
 
-        stage("Deploy") {
-            steps {
-                script {
-                    echo "Deploying the Docker container..."
-                    sh """
-                        docker stop ${DOCKER_CONTAINER} || true
-                        docker rm ${DOCKER_CONTAINER} || true
-                        docker run --name ${DOCKER_CONTAINER} -d -p 9090:8080 ${DOCKER_IMAGE}
-                    """
-                    sh 'docker ps'  
-                }
-            }
-        }
+     
     }
 }
