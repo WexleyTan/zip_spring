@@ -23,35 +23,43 @@ pipeline {
                             rm -rf ${DIR_UNZIP}  
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
+                        else
+                            echo "File ${FILE_NAME} does not exist!"
                         fi
                     """
                 }
             }
         }
-	
-	stage('Create Dockerfile') {
+        
+        stage('Create Dockerfile') {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
-                    WORKDIR /app
-                    COPY . .
-                    RUN mvn clean package
-                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                    COPY --from=build /app/target/*.jar /app/app.jar
-                    EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
+                    dir("${DIR_UNZIP}") {  // Ensure the Dockerfile is created in the correct directory
+                        sh '''
+                            cat <<EOF > Dockerfile
+                            FROM maven:3.8.7-eclipse-temurin-19 AS build
+                            WORKDIR /app
+                            COPY . .
+                            RUN mvn clean package
+
+                            FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
+                            COPY --from=build /app/target/*.jar /app/app.jar
+                            EXPOSE 9090
+                            ENTRYPOINT ["java", "-jar", "app.jar"]
+                            EOF
+                        '''
+                    
+                    }
                 }
             }
         }
         
-         stage("Clean Package") {
+        stage("Clean Package") {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_FILE}") {  
+                    dir("${DIR_UNZIP}") {  
                         sh 'mvn clean install' 
                     }
                 }
@@ -61,16 +69,10 @@ pipeline {
         stage("Build Docker Image") {
             steps {
                 script {
-                    echo "Building the Maven project..."
-                    sh """
-                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                            cd ${DIR_UNZIP}  
-                            mvn clean install
-                        fi
-                    """
-
                     echo "Building Docker image..."
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
+                    dir("${DIR_UNZIP}") {
+                        sh "docker build -t ${DOCKER_IMAGE} ."
+                    }
                 }
             }
         }
@@ -80,7 +82,7 @@ pipeline {
                 script {
                     echo "Deploying the Docker container..."
                     sh """
-                        docker start ${DOCKER_CONTAINER} || docker run --name ${DOCKER_CONTAINER} -d -p 9090:8080 ${DOCKER_IMAGE}
+                        docker start ${DOCKER_CONTAINER} || docker run --name ${DOCKER_CONTAINER} -d -p 9090:9090 ${DOCKER_IMAGE}
                     """
                 }
             }
