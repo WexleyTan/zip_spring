@@ -57,8 +57,8 @@ pipeline {
                     """
 
                     echo "Building Docker image..."
-                    sh "cp ../Dockerfile ."
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
+               
+                    sh "docker build -t ${DOCKER_IMAGE} -f Dockerfile.dev ."  
                 }
             }
         }
