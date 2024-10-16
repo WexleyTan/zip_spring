@@ -26,14 +26,7 @@ pipeline {
                 }
             }
         }
-          stage('Copy Dockerfile') {
-            steps {
-                script {
-                    echo "Copying Dockerfile to ${DIR_UNZIP}..."
-                    sh "cp ../Dockerfile ${DIR_UNZIP}/"
-                }
-            }
-        }
+        
 
         stage('Create Dockerfile') {
             steps {
@@ -49,6 +42,15 @@ pipeline {
                         EXPOSE 9090
                         ENTRYPOINT ["java", "-jar", "app.jar"]
                     '''
+                }
+            }
+        }
+
+          stage('Copy Dockerfile') {
+            steps {
+                script {
+                    echo "Copying Dockerfile to ${DIR_UNZIP}..."
+                    sh "cp ../Dockerfile ${DIR_UNZIP}/"
                 }
             }
         }
