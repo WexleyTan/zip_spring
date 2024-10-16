@@ -60,7 +60,7 @@ pipeline {
                     echo "Building the Maven project..."
                     dir("${DIR_UNZIP}") {
                         sh """
-                            if [ -f 'pom.xml' ]; then  
+                            if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
                                 mvn clean install
                             fi
                         """
@@ -71,4 +71,5 @@ pipeline {
             }
         }
     }
+}
 }
