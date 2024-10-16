@@ -10,7 +10,8 @@ pipeline {
         DOCKER_IMAGE = "${IMAGE}:${BUILD_NUMBER}"
         DOCKER_CONTAINER = "springboot_jenkins"
     }
-        stage('Unzip File') {
+    
+    stage('Unzip File') {
             steps {
                 script {
                     echo "Checking if the file ${FILE_NAME} exists and unzipping it if present..."
