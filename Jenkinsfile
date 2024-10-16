@@ -52,14 +52,13 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/my_project") {
+                    dir("${DIR_UNZIP}/Dockerfile") {
                         sh 'ls -l'    
                         sh 'mvn clean install'
-                        }
-                            error("pom.xml not found in ${DIR_UNZIP}")
-                        }
                     }
                 }
+            }
+         }
 
         stage("Build Docker Image") {
             steps {
