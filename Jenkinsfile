@@ -32,15 +32,15 @@ pipeline {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    writeFile file: "${DIR_UNZIP}/Dockerfile", text: '''
-                        FROM maven:3.8.7-eclipse-temurin-19 AS build
-                        WORKDIR /app
-                        COPY . .
-                        RUN mvn clean package/pom.xml
-                        FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                        COPY --from=build /app/target/*.jar /app/app.jar
-                        EXPOSE 9090
-                        ENTRYPOINT ["java", "-jar", "app.jar"]
+                    '''
+                    FROM maven:3.8.7-eclipse-temurin-19 AS build
+                    WORKDIR /app
+                    COPY . .
+                    RUN mvn clean package
+                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
+                    COPY --from=build /app/target/*.jar /app/app.jar
+                    EXPOSE 9090
+                    ENTRYPOINT ["java", "-jar", "app.jar"]
                     '''
                 }
             }
@@ -50,8 +50,8 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/pom.xml") {
-                            sh 'mvn clean install'
+                    dir("${DIR_UNZIP}") {
+                            sh 'mvn clean install -X'
                         }
                             error("pom.xml not found in ${DIR_UNZIP}")
                         }
