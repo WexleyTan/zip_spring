@@ -21,6 +21,8 @@ pipeline {
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
+                            echo "Listing files in ${DIR_UNZIP}:"
+                            ls -l ${DIR_UNZIP}
                         fi
                     """
                 }
@@ -50,8 +52,9 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}") {
-                            sh 'mvn clean install -X'
+                    dir("${DIR_UNZIP}/my_project") {
+                        sh 'ls -l'    
+                        sh 'mvn clean install'
                         }
                             error("pom.xml not found in ${DIR_UNZIP}")
                         }
