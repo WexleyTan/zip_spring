@@ -10,27 +10,6 @@ pipeline {
         DOCKER_IMAGE = "${IMAGE}:${BUILD_NUMBER}"
         DOCKER_CONTAINER = "springboot_jenkins"
     }
-
-    stages {
-       stage('Create Dockerfile') {
-            steps {
-                script {
-                    echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
-                    WORKDIR /app
-                    COPY . .
-                    RUN mvn clean package
-                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                    COPY --from=build /app/target/*.jar /app/app.jar
-                    EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
-                }
-            }
-        }
-
-
         stage('Unzip File') {
             steps {
                 script {
@@ -47,20 +26,37 @@ pipeline {
             }
         }
 
-        stage("Build Maven Project") {
+        stages {
+           stage('Create Dockerfile') {
+                steps {
+                    script {
+                        echo "Creating Dockerfile..."
+                        '''
+                        FROM maven:3.8.7-eclipse-temurin-19 AS build
+                        WORKDIR /app
+                        COPY . .
+                        RUN mvn clean package
+                        FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
+                        COPY --from=build /app/target/*.jar /app/app.jar
+                        EXPOSE 9090
+                        ENTRYPOINT ["java", "-jar", "app.jar"]
+                        '''
+                    }
+                }
+            }
+
+          stage("Clean Package") {
             steps {
                 script {
-                    echo "Building the Maven project..."
-                    sh """
-                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                            cd ${DIR_UNZIP}
-                            mvn clean package
-                        fi
-                    """
+                    echo "Building the application..."
+                    dir("${DIR_UNZIP}") {  
+                        sh 'mvn clean install' 
+                    }
                 }
             }
         }
- 
+
+        
 
         stage("Build Docker Image") {
             steps {
