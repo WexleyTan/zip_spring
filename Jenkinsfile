@@ -35,22 +35,16 @@ pipeline {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    dir("${DIR_UNZIP}") {  
-                        sh '''
-                            
-                            FROM maven:3.8.7-eclipse-temurin-19 AS build
-                            WORKDIR /app
-                            COPY . .
-                            RUN mvn clean package
-
-                            FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                            COPY --from=build /app/target/*.jar /app/app.jar
-                            EXPOSE 9090
-                            ENTRYPOINT ["java", "-jar", "app.jar"]
-                            
-                        '''
-                    
-                    }
+                    '''
+                    FROM maven:3.8.7-eclipse-temurin-19 AS build
+                    WORKDIR /app
+                    COPY . .
+                    RUN mvn clean package
+                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
+                    COPY --from=build /app/target/*.jar /app/app.jar
+                    EXPOSE 9090
+                    ENTRYPOINT ["java", "-jar", "app.jar"]
+                    '''
                 }
             }
         }
@@ -59,7 +53,7 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}") {  
+                    dir("${DIR_FILE}") {  
                         sh 'mvn clean install' 
                     }
                 }
