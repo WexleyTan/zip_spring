@@ -52,27 +52,12 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/pom.xml") {
-                        sh 'ls -l'    
+                    dir("${DIR_UNZIP}/pom.xml") {  
                         sh 'mvn clean install'
                     }
                 }
             }
          }
-
-        stage("Build Docker Image") {
-            steps {
-                echo "Building Docker image..."
-                dir("${DIR_UNZIP}") { 
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
-                }
-                sh "docker images | grep -i ${IMAGE}"
-            }
-        }
-
-          
-
-
         // stage("Clean Package") {
         //     steps {
         //         script {
