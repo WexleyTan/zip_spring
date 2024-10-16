@@ -48,16 +48,16 @@ pipeline {
             }
         }
 
-         stage("Build Application") {
+        stage("Clean Package") {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/pom.xml") {  
-                        sh 'mvn clean install'
+                    dir("${DIR_FILE}") {  
+                        sh 'mvn clean install' 
                     }
                 }
             }
-         }
+        }
         // stage("Clean Package") {
         //     steps {
         //         script {
