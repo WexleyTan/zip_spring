@@ -44,6 +44,24 @@ pipeline {
             }
         }
 
+        stage("Build Application") {
+            steps {
+                script {
+                    echo "Building the application..."
+                    dir("${DIR_UNZIP}") {
+                        sh 'ls -l'
+                        if (fileExists('pom.xml')) {
+                            echo "Building with Maven..."
+                            sh 'mvn clean install'
+                        } else {
+                            error("pom.xml not found in ${DIR_UNZIP}")
+                        }
+                    }
+                }
+            }
+        }
+
+
         // stage("Clean Package") {
         //     steps {
         //         script {
