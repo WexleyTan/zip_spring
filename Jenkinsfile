@@ -1,32 +1,31 @@
 pipeline {
-    agent any
-    tools {
-        maven 'maven'
-    }
+    agent any 
     environment {
-        IMAGE = "spring_unzip"
-        FILE_NAME = "auto_deploy.zip"
-        DIR_UNZIP = "demo" 
+        IMAGE = "neathtan/spring_adv"
+        DIR_FILE = "auto_spring"  
         DOCKER_IMAGE = "${IMAGE}:${BUILD_NUMBER}"
-        DOCKER_CONTAINER = "springboot_jenkins"
         DOCKER_CREDENTIALS_ID = "dockertoken"
+        GIT_REPO = "https://github.com/WexleyTan/auto_spring.git"  
+        GIT_BRANCH = "master"  
+        GIT_MANIFEST_REPO = "https://github.com/WexleyTan/auto_spring_manifest.git"  
+        MANIFEST_REPO = "auto_spring_manifest"  
+        MANIFEST_FILE_PATH = "deployment.yaml" 
+        GIT_CREDENTIALS_ID = 'git_pass' 
     }
-
     stages {
-        stage('Unzip File') {
+        stage("Cloning file from GitHub") {
             steps {
                 script {
-                    echo "Checking if the file ${FILE_NAME} exists and unzipping it if present..."
+                    echo "Checking if the application repository exists and removing it if necessary..."
                     sh """
-                        if [ -f '${FILE_NAME}' ]; then
-                            echo "Removing existing files..."
-                            rm -rf ${DIR_UNZIP}  
-                            echo "Unzipping the file..."
-                            unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
-                        else
-                            echo "File ${FILE_NAME} does not exist!"
+                        if [ -d "${DIR_FILE}" ]; then
+                            echo "Directory ${DIR_FILE} exists, removing it..."
+                            rm -rf ${DIR_FILE}  
                         fi
                     """
+                    
+                    echo "Cloning the git repository..."
+                    sh "git clone -b ${GIT_BRANCH} ${GIT_REPO} ${DIR_FILE}" 
                 }
             }
         }
@@ -49,35 +48,13 @@ pipeline {
             }
         }
         
-        stage("Clean Package") {
+         stage("Clean Package") {
             steps {
                 script {
                     echo "Building the application..."
                     dir("${DIR_FILE}") {  
                         sh 'mvn clean install' 
                     }
-                }
-            }
-        }
-
-        stage("Build Docker Image") {
-            steps {
-                script {
-                    echo "Building Docker image..."
-                    dir("${DIR_UNZIP}") {
-                        sh "docker build -t ${DOCKER_IMAGE} ."
-                    }
-                }
-            }
-        }
-
-        stage("Deploy") {
-            steps {
-                script {
-                    echo "Deploying the Docker container..."
-                    sh """
-                        docker start ${DOCKER_CONTAINER} || docker run --name ${DOCKER_CONTAINER} -d -p 9090:9090 ${DOCKER_IMAGE}
-                    """
                 }
             }
         }
