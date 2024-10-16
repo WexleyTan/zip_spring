@@ -6,7 +6,7 @@ pipeline {
     environment {
         IMAGE = "spring_unzip"
         FILE_NAME = "auto_deploy.zip"
-        DIR_UNZIP = "demo"
+        DIR_UNZIP = "auto_deploy"
         DOCKER_IMAGE = "${IMAGE}:${BUILD_NUMBER}"
         DOCKER_CONTAINER = "springboot_jenkins"
     }
