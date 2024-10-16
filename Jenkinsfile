@@ -28,6 +28,17 @@ pipeline {
                 }
             }
         }
+
+          stage("Clean Package") {
+            steps {
+                script {
+                    echo "Building the application..."
+                    dir("${DIR_FILE}") {  
+                        sh 'mvn clean install' 
+                    }
+                }
+            }
+        }
         
         stage('Create Dockerfile') {
             steps {
@@ -43,17 +54,6 @@ pipeline {
                     EXPOSE 9090
                     ENTRYPOINT ["java", "-jar", "app.jar"]
                     '''
-                }
-            }
-        }
-        
-         stage("Clean Package") {
-            steps {
-                script {
-                    echo "Building the application..."
-                    dir("${DIR_FILE}") {  
-                        sh 'mvn clean install' 
-                    }
                 }
             }
         }
