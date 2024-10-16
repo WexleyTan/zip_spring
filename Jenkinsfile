@@ -50,9 +50,11 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/pom.xml") {  
-                        sh 'mvn clean install' 
-                    }
+                    sh """
+                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
+                            mvn clean install
+                        fi
+                    """
                 }
             }
         }
