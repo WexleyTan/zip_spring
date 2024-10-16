@@ -65,7 +65,7 @@ pipeline {
         stage("Build Docker Image") {
             steps {
                 echo "Building Docker image..."
-                dir("${DIR_FILE}") { 
+                dir("${DIR_UNZIP}") { 
                 sh "docker build -t ${DOCKER_IMAGE} ."  
                 }
                 sh "docker images | grep -i ${IMAGE}"
