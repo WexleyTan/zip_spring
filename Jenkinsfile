@@ -46,20 +46,12 @@ pipeline {
             }
         }
 
-          stage('Copy Dockerfile') {
-            steps {
-                script {
-                    echo "Copying Dockerfile to ${DIR_UNZIP}..."
-                    sh "cp ../Dockerfile ${DIR_UNZIP}/"
-                }
-            }
-        }
-
-        stage("Build Application") {
+         stage("Build Application") {
             steps {
                 script {
                     echo "Building the application..."
                     dir("${DIR_UNZIP}") {
+                        // Check if pom.xml exists before running mvn
                         sh 'ls -l'
                         if (fileExists('pom.xml')) {
                             echo "Building with Maven..."
@@ -71,6 +63,18 @@ pipeline {
                 }
             }
         }
+
+        stage("Build Docker Image") {
+            steps {
+                echo "Building Docker image..."
+                dir("${DIR_UNZIP}") { 
+                    sh "docker build -t ${DOCKER_IMAGE} ."  
+                }
+                sh "docker images | grep -i ${IMAGE}"
+            }
+        }
+
+          
 
 
         // stage("Clean Package") {
@@ -85,15 +89,15 @@ pipeline {
         //     }
         // }
 
-        stage("Build Docker Image") {
-            steps {
-                echo "Building Docker image..."
-                dir("${DIR_UNZIP}") { 
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
-                }
-                sh "docker images | grep -i ${IMAGE}"
-            }
-        }
+        // stage("Build Docker Image") {
+        //     steps {
+        //         echo "Building Docker image..."
+        //         dir("${DIR_UNZIP}") { 
+        //             sh "docker build -t ${DOCKER_IMAGE} ."  
+        //         }
+        //         sh "docker images | grep -i ${IMAGE}"
+        //     }
+        // }
 
      
     }
