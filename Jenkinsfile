@@ -61,6 +61,19 @@ pipeline {
                 }
             }
         }
+        stage('Check Dockerfile') {
+            steps {
+                script {
+                    echo "Checking if Dockerfile exists..."
+                    sh """
+                        if [ ! -f "${DIR_UNZIP}/Dockerfile" ]; then
+                            echo "Dockerfile not found in ${DIR_UNZIP}"
+                            exit 1
+                        fi
+                    """
+                }
+            }
+        }
 
         stage("Build Docker Image") {
             steps {
