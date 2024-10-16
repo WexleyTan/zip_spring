@@ -51,18 +51,12 @@ pipeline {
                 script {
                     echo "Building the application..."
                     dir("${DIR_UNZIP}") {
-                        // Check if pom.xml exists before running mvn
-                        sh 'ls -l'
-                        if (fileExists('pom.xml')) {
-                            echo "Building with Maven..."
                             sh 'mvn clean install'
-                        } else {
+                        }
                             error("pom.xml not found in ${DIR_UNZIP}")
                         }
                     }
                 }
-            }
-        }
 
         stage("Build Docker Image") {
             steps {
