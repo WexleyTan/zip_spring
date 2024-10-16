@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/Dockerfile") {  
+                    dir("${DIR_UNZIP}/pom.xml") {  
                         sh 'mvn clean install' 
                     }
                 }
