@@ -23,44 +23,57 @@ pipeline {
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
                         else
                             echo "File ${FILE_NAME} does not exist!"
+                            exit 1  # Exit if the file does not exist
                         fi
                     """
                 }
             }
         }
 
-        
         stage('Create Dockerfile') {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
-                    WORKDIR /app
-                    COPY . .
-                    RUN mvn clean package
-                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                    COPY --from=build /app/target/*.jar /app/app.jar
-                    EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
+                    dir("${DIR_UNZIP}") {  // Ensure Dockerfile is created in the correct directory
+                        sh '''
+                            cat <<EOF > Dockerfile
+                            FROM maven:3.8.7-eclipse-temurin-19 AS build
+                            WORKDIR /app
+                            COPY . .
+                            RUN mvn clean package
+
+                            FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
+                            COPY --from=build /app/target/*.jar /app/app.jar
+                            EXPOSE 9090
+                            ENTRYPOINT ["java", "-jar", "app.jar"]
+                            EOF
+                        '''
+                        // Verify that the Dockerfile has been created
+                        sh "ls -l ${DIR_UNZIP}"  // List files to confirm Dockerfile existence
+                    }
                 }
             }
         }
-        
+
         stage("Build Docker Image") {
             steps {
                 script {
                     echo "Building the Maven project..."
-                    sh """
-                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                            cd ${DIR_UNZIP}  
-                            mvn clean install
-                        fi
-                    """
+                    dir("${DIR_UNZIP}") {
+                        sh """
+                            if [ -f 'pom.xml' ]; then  
+                                mvn clean install
+                            else
+                                echo "No pom.xml found in ${DIR_UNZIP}. Aborting build."
+                                exit 1
+                            fi
+                        """
+                    }
 
                     echo "Building Docker image..."
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
+                    dir("${DIR_UNZIP}") {  // Ensure we're in the correct directory for the Docker build
+                        sh "docker build -t ${DOCKER_IMAGE} ."
+                    }
                 }
             }
         }
