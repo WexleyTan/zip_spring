@@ -46,23 +46,19 @@ pipeline {
             }
         }
         
-         stage("Clean Package") {
+        stage("Build Docker Image") {
             steps {
                 script {
-                    echo "Building the application..."
+                    echo "Building the Maven project..."
                     sh """
                         if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
+                            cd ${DIR_UNZIP}  
                             mvn clean install
                         fi
-                    """ 
-                }
-            }
-        }
-        stage("build docker image") {
-            steps {
-                script {
+                    """
+
                     echo "Building Docker image..."
-                    sh "docker build -t ${DOCKER_IMAGE} ."
+                    sh "docker build -t ${DOCKER_IMAGE} ."  
                 }
             }
         }
