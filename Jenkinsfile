@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    dir("${DIR_UNZIP}") {  // Ensure Dockerfile is created in the correct directory
+                    dir("${DIR_UNZIP}") {  
                         sh '''
                             cat <<EOF > Dockerfile
                             FROM maven:3.8.7-eclipse-temurin-19 AS build
@@ -46,10 +46,9 @@ pipeline {
                             COPY --from=build /app/target/*.jar /app/app.jar
                             EXPOSE 9090
                             ENTRYPOINT ["java", "-jar", "app.jar"]
-                            EOF
+                        
                         '''
-                        // Verify that the Dockerfile has been created
-                        sh "ls -l ${DIR_UNZIP}"  // List files to confirm Dockerfile existence
+                    
                     }
                 }
             }
@@ -71,7 +70,7 @@ pipeline {
                     }
 
                     echo "Building Docker image..."
-                    dir("${DIR_UNZIP}") {  // Ensure we're in the correct directory for the Docker build
+                    dir("${DIR_UNZIP}") { 
                         sh "docker build -t ${DOCKER_IMAGE} ."
                     }
                 }
