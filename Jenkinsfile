@@ -47,5 +47,16 @@ pipeline {
                 }
             }
         }
+        
+        stage("Clean Package") {
+            steps {
+                script {
+                    echo "Building the application..."
+                    dir("${DIR_UNZIP}") {  
+                        sh 'mvn clean install' 
+                    }
+                }
+            }
+        }
     }
 }
