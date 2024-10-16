@@ -44,17 +44,17 @@ pipeline {
             }
         }
 
-        stage("Clean Package") {
-            steps {
-                script {
-                    echo "Building the application..."
-                    dir("${DIR_UNZIP}") {
-                        sh 'ls -l'
-                        sh 'mvn clean install' 
-                    }
-                }
-            }
-        }
+        // stage("Clean Package") {
+        //     steps {
+        //         script {
+        //             echo "Building the application..."
+        //             dir("${DIR_UNZIP}") {
+        //                 sh 'ls -l'
+        //                 sh 'mvn clean install' 
+        //             }
+        //         }
+        //     }
+        // }
 
         stage("Build Docker Image") {
             steps {
