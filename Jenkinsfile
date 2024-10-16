@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_FILE}") {  
+                    dir("${DIR_UNZIP}") {  
                         sh 'mvn clean install' 
                     }
                 }
