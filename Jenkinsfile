@@ -66,10 +66,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image from Dockerfile..."
-                    sh """
-                        cd ${DIR_UNZIP}
-                        docker build -t ${DOCKER_IMAGE} .
-                    """
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -83,16 +80,8 @@ pipeline {
                         docker rm ${DOCKER_CONTAINER} || true
                         docker run --name ${DOCKER_CONTAINER} -d -p 9090:8080 ${DOCKER_IMAGE}
                     """
-                    sh 'docker ps'
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Cleaning up Docker images..."
-            sh 'docker image prune -f'
         }
     }
 }
