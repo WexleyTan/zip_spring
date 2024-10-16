@@ -35,9 +35,9 @@ pipeline {
             steps {
                 script {
                     echo "Creating Dockerfile..."
-                    dir("${DIR_UNZIP}") {  // Ensure the Dockerfile is created in the correct directory
+                    dir("${DIR_UNZIP}") {  
                         sh '''
-                            cat <<EOF > Dockerfile
+                            
                             FROM maven:3.8.7-eclipse-temurin-19 AS build
                             WORKDIR /app
                             COPY . .
@@ -47,7 +47,7 @@ pipeline {
                             COPY --from=build /app/target/*.jar /app/app.jar
                             EXPOSE 9090
                             ENTRYPOINT ["java", "-jar", "app.jar"]
-                            EOF
+                            
                         '''
                     
                     }
