@@ -64,9 +64,11 @@ pipeline {
 
         stage("Build Docker Image") {
             steps {
-                 script {
-                    def Image = docker.build("my-image:${env.BUILD_ID}")
+                echo "Building Docker image..."
+                dir("${DIR_FILE}") { 
+                sh "docker build -t ${DOCKER_IMAGE} ."  
                 }
+                sh "docker images | grep -i ${IMAGE}"
             }
         }
 
