@@ -42,6 +42,7 @@ pipeline {
                             COPY --from=build /app/target/*.jar /app/app.jar
                             EXPOSE 8181
                             CMD ["java", "-jar", "/app/app.jar"] " > /var/lib/jenkins/workspace/${JOB_NAME}/${DIR_UNZIP}/Dockerfile
+                            ls -l
                     """
                 }
             }
