@@ -21,8 +21,6 @@ pipeline {
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
-                            echo "Listing files in ${DIR_UNZIP}:"
-                            ls -l ${DIR_UNZIP}  # Verify the contents
                         fi
                     """
                 }
