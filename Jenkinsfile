@@ -14,8 +14,7 @@ pipeline {
         stage('Unzip File') {
             steps {
                 script {
-                    echo "${$JOB_NAME}"
-                    echo "Checking if the file ${FILE_NAME} exists and unzipping it if present..."
+                    echo "Checking if the file ${FILE_NAME} exists and unzipping it if present... with job name is ${JOB_NAME}"
                     sh """
                         pwd
                         if [ -f '${FILE_NAME}' ]; then
