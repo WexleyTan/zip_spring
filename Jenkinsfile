@@ -38,19 +38,11 @@ pipeline {
                             mvn clean install
                         fi
                     """
+                    echo "Building Docker image..."
+                    sh "docker build -t ${DOCKER_IMAGE} ." 
                     }
                 }
             }
         
-
-        stage("Build Docker Image") {
-            steps {
-                echo "Building Docker image..."
-                dir("${DIR_UNZIP}") { 
-                    sh "docker build -t ${DOCKER_IMAGE} ."  
-                }
-                sh "docker images | grep -i ${IMAGE}"
-            }
-        }
     }
 }
