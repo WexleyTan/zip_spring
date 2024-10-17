@@ -21,7 +21,7 @@ pipeline {
                             echo "Removing existing files..."
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
-                            unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
+                            unzip -o '${FILE_NAME}'
                         fi
                     """
                 }
@@ -38,7 +38,7 @@ pipeline {
                     FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
                     COPY --from=build /app/target/*.jar /app/app.jar
                     EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"] " > /var/lib/jenkins/workspace/spring-zip/auto_deploy/Dockerfile
+                    ENTRYPOINT ["java", "-jar", "app.jar"] " > /var/lib/jenkins/workspace/${JOB_NAME}/Dockerfile
                     ls -l
                 """
             }
