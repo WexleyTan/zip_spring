@@ -60,7 +60,7 @@ pipeline {
                     // """
                     echo "Building Docker image..."
                     sh " ls -l "
-                    sh "docker build -t ${DOCKER_IMAGE} ./${FILE_NAME}" 
+                    sh "docker build -t ${DOCKER_IMAGE} ./${DIR_UNZIP}" 
                     }
                 }
             }
