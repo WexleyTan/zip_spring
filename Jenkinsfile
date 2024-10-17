@@ -30,22 +30,17 @@ pipeline {
 
         stage('Create Dockerfile') {
             steps {
-                script {
-                    echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
+                sh """
+                echo " FROM maven:3.8.7-eclipse-temurin-19 AS build
                     WORKDIR /app
                     COPY . /app/  
                     RUN mvn clean package
                     FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
                     COPY --from=build /app/target/*.jar /app/app.jar
                     EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
-                    sh "ls -l ${DIR_UNZIP}"
-                    sh "pwd"
-                    sh "ls -l"
-                }
+                    ENTRYPOINT ["java", "-jar", "app.jar"] " > /var/lib/jenkins/workspace/spring-zip
+                
+                """
             }
         }
 
