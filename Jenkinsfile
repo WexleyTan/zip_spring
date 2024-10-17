@@ -21,64 +21,38 @@ pipeline {
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
+                            echo "Listing files in ${DIR_UNZIP}:"
+                            ls -l ${DIR_UNZIP}  # Verify the contents
                         fi
                     """
                 }
             }
         }
-        
-
-        stage('Create Dockerfile') {
-            steps {
-                script {
-                    echo "Creating Dockerfile..."
-                    '''
-                    FROM maven:3.8.7-eclipse-temurin-19 AS build
-                    WORKDIR /app
-                    COPY . .
-                    RUN mvn clean package
-                    FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
-                    COPY --from=build /app/target/*.jar /app/app.jar
-                    EXPOSE 9090
-                    ENTRYPOINT ["java", "-jar", "app.jar"]
-                    '''
-                }
-            }
-        }
-
-        stage("Clean Package") {
+        stage("Build Application") {
             steps {
                 script {
                     echo "Building the application..."
-                    sh 'ls -a ${DIR_UNZIP} '
-                    dir("${DIR_UNZIP}/pom.xml") {  
-                        sh 'mvn clean install' 
+                    dir("${DIR_UNZIP}/my_project") {  // Adjust based on your structure
+                        sh 'ls -l'  // List files to confirm presence of pom.xml
+                        if (fileExists('pom.xml')) {
+                            echo "Building with Maven..."
+                            sh 'mvn clean install'
+                        } else {
+                            error("pom.xml not found in ${DIR_UNZIP}/my_project")
+                        }
                     }
                 }
             }
         }
-        // stage("Clean Package") {
-        //     steps {
-        //         script {
-        //             echo "Building the application..."
-        //             dir("${DIR_UNZIP}") {
-        //                 sh 'ls -l'
-        //                 sh 'mvn clean install' 
-        //             }
-        //         }
-        //     }
-        // }
 
-        // stage("Build Docker Image") {
-        //     steps {
-        //         echo "Building Docker image..."
-        //         dir("${DIR_UNZIP}") { 
-        //             sh "docker build -t ${DOCKER_IMAGE} ."  
-        //         }
-        //         sh "docker images | grep -i ${IMAGE}"
-        //     }
-        // }
-
-     
+        stage("Build Docker Image") {
+            steps {
+                echo "Building Docker image..."
+                dir("${DIR_UNZIP}") { 
+                    sh "docker build -t ${DOCKER_IMAGE} ."  
+                }
+                sh "docker images | grep -i ${IMAGE}"
+            }
+        }
     }
 }
