@@ -21,8 +21,6 @@ pipeline {
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
-                            echo "Listing files in ${DIR_UNZIP}:"
-                            ls -l ${DIR_UNZIP}
                         fi
                     """
                 }
@@ -52,7 +50,8 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/pom.xml") {  
+                    sh 'ls ${DIR_UNZIP} '
+                    dir("${DIR_UNZIP}") {  
                         sh 'mvn clean install' 
                     }
                 }
