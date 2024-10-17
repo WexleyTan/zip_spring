@@ -44,6 +44,7 @@ pipeline {
                     '''
                     sh "ls -l ${DIR_UNZIP}"
                     sh "pwd"
+                    sh "ls -l"
                 }
             }
         }
