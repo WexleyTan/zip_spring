@@ -32,18 +32,16 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    dir("${DIR_UNZIP}/my_project") {  // Adjust based on your structure
-                        sh 'ls -l'  // List files to confirm presence of pom.xml
-                        if (fileExists('pom.xml')) {
-                            echo "Building with Maven..."
-                            sh 'mvn clean install'
-                        } else {
-                            error("pom.xml not found in ${DIR_UNZIP}/my_project")
-                        }
+                      sh """
+                        if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
+                            cd ${DIR_UNZIP}  
+                            mvn clean install
+                        fi
+                    """
                     }
                 }
             }
-        }
+        
 
         stage("Build Docker Image") {
             steps {
