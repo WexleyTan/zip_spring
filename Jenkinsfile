@@ -41,6 +41,7 @@ pipeline {
                     EXPOSE 9090
                     ENTRYPOINT ["java", "-jar", "app.jar"]
                     '''
+                    sh "ls -l ${DIR_UNZIP}"
                 }
             }
         }
