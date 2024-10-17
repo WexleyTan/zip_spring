@@ -23,6 +23,7 @@ pipeline {
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}'
                         fi
+                        ls -l
                     """
                 }
             }
