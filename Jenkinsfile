@@ -39,7 +39,7 @@ pipeline {
                     COPY --from=build /app/target/*.jar /app/app.jar
                     EXPOSE 9090
                     ENTRYPOINT ["java", "-jar", "app.jar"] " > /var/lib/jenkins/workspace/spring-zip/Dockerfile
-                
+                    ls -l
                 """
             }
         }
