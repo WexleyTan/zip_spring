@@ -16,13 +16,13 @@ pipeline {
                 script {
                     echo "Checking if the file ${FILE_NAME} exists and unzipping it if present..."
                     sh """
+                        pwd
                         if [ -f '${FILE_NAME}' ]; then
                             echo "Removing existing files..."
                             rm -rf ${DIR_UNZIP}
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
                         fi
-                        sh "pwd"
                     """
                 }
             }
