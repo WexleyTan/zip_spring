@@ -22,7 +22,7 @@ pipeline {
                             echo "Unzipping the file..."
                             unzip -o '${FILE_NAME}' -d ${DIR_UNZIP}/
                         fi
-                        echo ' pwd ' 
+                        sh "pwd"
                     """
                 }
             }
