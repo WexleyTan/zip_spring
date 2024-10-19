@@ -31,9 +31,10 @@ pipeline {
 
         stage('Create Dockerfile') {
             steps {
-                dir("${DIR_UNZIP}"){
-                    sh """
-                    echo "
+                script {
+                    dir ("${DIR_FILE}") {
+                    echo "Creating Dockerfile..."
+                    writeFile file: 'Dockerfile', text: '''
                             FROM maven:3.8.7-eclipse-temurin-19 AS build
                             WORKDIR /app
                             COPY . .
@@ -41,9 +42,10 @@ pipeline {
                             FROM eclipse-temurin:22.0.1_8-jre-ubi9-minimal
                             COPY --from=build /app/target/*.jar /app/app.jar
                             EXPOSE 8181
-                            CMD ["java", "-jar", "/app/app.jar"] " > /var/lib/jenkins/workspace/${JOB_NAME}/${DIR_UNZIP}/Dockerfile
+                            CMD ["java", "-jar", "/app/app.jar"] "
                             ls -l
-                    """
+                            '''
+                    }
                 }
             }
         }
@@ -51,13 +53,7 @@ pipeline {
         stage("Build Application") {
             steps {
                 script {
-                    echo "Building the application..."
-                    //   sh """
-                    //     if [ -f '${DIR_UNZIP}/pom.xml' ]; then  
-                    //         cd ${DIR_UNZIP}  
-                    //         mvn clean install
-                    //     fi
-                    // """
+
                     echo "Building Docker image..."
                     sh " ls -l "
                     sh "docker build -t ${DOCKER_IMAGE} ./${DIR_UNZIP}" 
